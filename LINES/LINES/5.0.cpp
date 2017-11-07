@@ -33,11 +33,12 @@ void Paint(HDC hdc, HDC hdcMem)
     GetObject(hBitmapBKG, sizeof(bm), &bm);
     BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hDC, 0, 0,SRCCOPY);
     if (START)
+    {
         for (int i = 0; i < 3; i++)
         {
-            ImageList_Draw(himl3,LOWORD(walkability[fetus[i].x][fetus[i].y]) / 22
-                           , hdcMem, 163 + i * 25, 5,ILD_TRANSPARENT);
+            ImageList_Draw(himl3, LOWORD(walkability[fetus[i].x][fetus[i].y]) / 22, hdcMem, 163 + i * 25, 5, ILD_TRANSPARENT);
         }
+    }
     int mul = 10000;
     for (int i = 0; i < 5; i++)
     {
@@ -57,9 +58,15 @@ void Paint(HDC hdc, HDC hdcMem)
 
 
     for (int i = 0; i < 9; i++)
+    {
         for (int j = 0; j < 9; j++)
+        {
             if (walkability[i][j])
-                ImageList_Draw(himl,LOWORD(walkability[i][j]) + HIWORD(walkability[i][j]) - 1, hdcMem, 45 * i + 5, 45 * j + 56,ILD_NORMAL);
+            {
+                ImageList_Draw(himl, LOWORD(walkability[i][j]) + HIWORD(walkability[i][j]) - 1, hdcMem, 45 * i + 5, 45 * j + 56, ILD_NORMAL);
+            }
+        }
+    }
     DeleteDC(hDC);
 }
 
@@ -105,15 +112,13 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50),
-                                  IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
+    wcex.hIcon = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
 
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = nullptr;
     wcex.lpszMenuName = MAKEINTRESOURCE(IDC_MY50);
     wcex.lpszClassName = szWindowClass;
-    wcex.hIconSm = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50),
-                                    IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    wcex.hIconSm = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 
     return RegisterClassEx(&wcex);
 }
@@ -123,7 +128,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance;
 
     HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_CAPTION | WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU,
-        CW_USEDEFAULT, 0, 416, 512, NULL, NULL, hInstance, NULL);
+        CW_USEDEFAULT, 0, 426, 520, NULL, NULL, hInstance, NULL);
 
     if (!hWnd)
     {
@@ -142,20 +147,25 @@ void CreateBubbles(HWND hWnd)
 
     srand((unsigned)time(nullptr));
     if (!START)
+    {
         for (int i = 0; i < 5; i++)
         {
             do
             {
                 x = rand() % 9;
                 y = rand() % 9;
-            }
-            while (walkability[x][y]);
+            } while (walkability[x][y]);
             walkability[x][y] = (rand() % 7) * 22 + 1;
             COUNT_BUBBLES++;
         }
+    }
     else
+    {
         for (int i = 0; i < 3; i++)
+        {
             walkability[fetus[i].x][fetus[i].y] &= zero;
+        }
+    }
     for (int i = 0; i < 3; i++)
     {
         do
@@ -176,8 +186,8 @@ void CreateBubbles(HWND hWnd)
             COUNT_BUBBLES = 0;
             PlaySound(MY_SOUND_CANT_MOVE, nullptr, SND_FILENAME | SND_ASYNC);
             START = FALSE;
-            if (MessageBox(nullptr, _T("GAME OVER"),_T(""),MB_OK))
-            PostMessage(hWnd,WM_COMMAND,ID_GAME_NEW, 0);
+            if (MessageBox(nullptr, _T("GAME OVER"), _T(""), MB_OK))
+            PostMessage(hWnd, WM_COMMAND, ID_GAME_NEW, 0);
             break;
         }
         PlaySound(MY_SOUND_FETUS, nullptr, SND_FILENAME | SND_ASYNC);
@@ -224,13 +234,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ANIMATE_RUN = false;
             path = FindPath(startX, startY, x, y);
             if (path == found)
+            {
                 COUNT_RUN = pathLength;
+            }
         }
         break;
     case WM_COMMAND:
         wmId = LOWORD(wParam);
         wmEvent = HIWORD(wParam);
-        // Parse the menu selections:
         switch (wmId)
         {
         case IDM_ABOUT:
@@ -270,7 +281,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 COUNT_BUBBLES = 0;
                 int k = 0;
                 for (int i = 0; i < 9; i++)
+                {
                     for (int j = 0; j < 9; j++)
+                    {
                         if (walkability[i][j])
                         {
                             COUNT_BUBBLES++;
@@ -280,11 +293,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                                 fetus[k++].y = j;
                             }
                         }
+                    }
+                }
                 START = TRUE;
                 T1 = GetTickCount() - (my_time.hour * 3600 + my_time.min * 60 + my_time.sec) * 1000;
             }
             else
-            MessageBox(hWnd,_T("Невозможно открыть файл"),_T("Ошибка"), MB_ICONWARNING | MB_OK);
+            {
+                MessageBox(hWnd, _T("Невозможно открыть файл"), _T("Ошибка"), MB_ICONWARNING | MB_OK);
+            }
 
             break;
 
@@ -292,8 +309,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ANIMATE_RUN = false;
             START = FALSE;
             for (int i = 0; i < 9; i++)
+            {
                 for (int j = 0; j < 9; j++)
+                {
                     walkability[i][j] = 0;
+                }
+            }
             COUNT_BUBBLES = 0;
             SCORE = 0;
             CreateBubbles(hWnd);
@@ -308,10 +329,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CREATE:
 
-        himl = ImageList_Create(40, 40,ILC_COLOR24, 154, 0);
-        himl2 = ImageList_Create(7, 13,ILC_COLOR32 | ILC_MASK, 10, 0);
-        himl3 = ImageList_Create(25, 25,ILC_COLOR24 | ILC_MASK, 7, 0);
-        himl4 = ImageList_Create(18, 35,ILC_COLOR32 | ILC_MASK, 10, 0);
+        himl = ImageList_Create(40, 40, ILC_COLOR24, 154, 0);
+        himl2 = ImageList_Create(7, 13, ILC_COLOR32 | ILC_MASK, 10, 0);
+        himl3 = ImageList_Create(25, 25, ILC_COLOR24 | ILC_MASK, 7, 0);
+        himl4 = ImageList_Create(18, 35, ILC_COLOR32 | ILC_MASK, 10, 0);
         ImageList_Add(himl, hBitmapNum1, (HBITMAP)nullptr);
         ImageList_Add(himl, hBitmapNum2, (HBITMAP)nullptr);
         ImageList_Add(himl, hBitmapNum3, (HBITMAP)nullptr);
@@ -322,7 +343,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ImageList_Add(himl2, hBitmapNum8, hBitmapNum12);
         ImageList_Add(himl3, hBitmapNum9, hBitmapNum13);
         ImageList_Add(himl4, hBitmapNum10, hBitmapNum11);
-        SetTimer(hWnd,TEMER_TIME, 100, nullptr);
+        SetTimer(hWnd, TEMER_TIME, 50, nullptr);
         hdc = GetDC(hWnd);
         hdcMem = CreateCompatibleDC(hdc);
         GetObject(hBitmapBKG, sizeof(bm), &bm);
@@ -343,8 +364,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 my_time.min = (T2 - T1) / (1000 * 60) - my_time.hour * 60;
                 my_time.sec = (T2 - T1) / 1000 - my_time.hour * 3600 - my_time.min * 60;
             }
-            if (ANIMATE_RUN)
+            if (ANIMATE_RUN) 
+            {
                 walkability[x][y] = ((((walkability[x][y] >> 16) + 1) % 7) << 16) + (walkability[x][y] & 0x0000ffff);
+            }
 
             if (COUNT_FETUS)
             {
@@ -369,19 +392,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 COUNT_FETUS--;
 
                 if (!COUNT_FETUS)
+                {
                     CreateBubbles(hWnd);
+                }
             }
 
             if (COUNT_DESTROY)
             {
                 for (int i = 0; i < LENGTH_DESTROY; i++)
+                {
                     walkability[PatchDestroy[i].x][PatchDestroy[i].y] = ((17 - COUNT_DESTROY) << 16) +
                         (walkability[PatchDestroy[i].x][PatchDestroy[i].y] & 0x0000ffff);
+                }
                 COUNT_DESTROY--;
                 if (!COUNT_DESTROY)
                 {
                     for (int i = 0; i < LENGTH_DESTROY; i++)
+                    {
                         walkability[PatchDestroy[i].x][PatchDestroy[i].y] = 0;
+                    }
                     dest_len(PatchDestroy);
                     SCORE += LENGTH_DESTROY;
                 }
@@ -395,13 +424,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     if (!walkability[pathBank[0].x][pathBank[0].y] ||
                         !(HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus)))
                     {
-                        walkability[pathBank[0].x][pathBank[0].y] =
-                            walkability[startX][startY] & zero;
+                        walkability[pathBank[0].x][pathBank[0].y] = walkability[startX][startY] & zero;
                     }
                     else
                     {
-                        walkability[pathBank[1].x][pathBank[1].y] =
-                            walkability[startX][startY] & zero;
+                        walkability[pathBank[1].x][pathBank[1].y] = walkability[startX][startY] & zero;
                         COUNT_RUN--;
                     }
                     walkability[startX][startY] = 0;

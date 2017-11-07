@@ -20,15 +20,23 @@ int FindPath(int startX, int startY, int targetX, int targetY)
     int a, b, m, temp, path, tempx, newOpenListItemID = 0;
 
     if (startX == targetX && startY == targetY)
+    {
         return found;
+    }
 
     if (walkability[targetX][targetY] != walkable &&
         HIWORD(walkability[targetX][targetY]) != HIWORD(walkability_fetus))
-        goto noPath;
+    {
+        xPath = startX;
+        yPath = startY;
+        return nonexistent;
+    }
     for (int x = 0; x < mapWidth; x++)
     {
         for (int y = 0; y < mapHeight; y++)
+        {
             whichList[x][y] = 0;
+        }
     }
     onClosedList = 2;
     int onOpenList = 1;
@@ -200,11 +208,7 @@ int FindPath(int startX, int startY, int targetX, int targetY)
             pathX = tempx;
         } while (pathX != startX || pathY != startY);
     }
-    return path;
-noPath:
-    xPath = startX;
-    yPath = startY;
-    return nonexistent;
+    return path;    
 }
 
 void EndPathfinder()

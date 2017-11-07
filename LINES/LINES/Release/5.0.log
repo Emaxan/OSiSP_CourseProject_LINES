@@ -1,14 +1,12 @@
 ﻿  5.0.cpp
-5.0.cpp(342): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
-5.0.cpp(343): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
-5.0.cpp(344): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
-5.0.cpp(190): warning C4101: 'ps': unreferenced local variable
-  Globals.cpp
-  PathFinder.cpp
+5.0.cpp(363): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
+5.0.cpp(364): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
+5.0.cpp(365): warning C4244: '=': conversion from 'unsigned long' to 'BYTE', possible loss of data
+5.0.cpp(200): warning C4101: 'ps': unreferenced local variable
   Generating code
-  6 of 26 functions (23.1%) were compiled, the rest were copied from previous compilation.
+  3 of 26 functions (11.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   5.0.vcxproj -> D:\University\5_sem\CourseProject\LINES\LINES\Release\5.0.exe
   5.0.vcxproj -> D:\University\5_sem\CourseProject\LINES\LINES\Release\5.0.pdb (Full PDB)
