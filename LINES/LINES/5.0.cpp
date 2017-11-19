@@ -31,7 +31,7 @@ void Paint(HDC hdc, HDC hdcMem)
     HDC hDC = CreateCompatibleDC(hdc);
     SelectObject(hDC, (HBITMAP)hBitmapBKG);
     GetObject(hBitmapBKG, sizeof(bm), &bm);
-    BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hDC, 0, 0,SRCCOPY);
+    BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hDC, 0, 0, SRCCOPY);
     if (START)
     {
         for (int i = 0; i < 3; i++)
@@ -42,19 +42,19 @@ void Paint(HDC hdc, HDC hdcMem)
     int mul = 10000;
     for (int i = 0; i < 5; i++)
     {
-        ImageList_Draw(himl4, (SCORE / mul) % 10, hdcMem, 290 + i * 20, 8,ILD_TRANSPARENT);
+        ImageList_Draw(himl4, (SCORE / mul) % 10, hdcMem, 290 + i * 20, 8, ILD_TRANSPARENT);
         mul /= 10;
     }
 
 
-    ImageList_Draw(himl2, my_time.hour / 10, hdcMem, 174, 34,ILD_TRANSPARENT);
-    ImageList_Draw(himl2, my_time.hour % 10, hdcMem, 183, 34,ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.hour / 10, hdcMem, 174, 34, ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.hour % 10, hdcMem, 183, 34, ILD_TRANSPARENT);
 
-    ImageList_Draw(himl2, my_time.min / 10, hdcMem, 193, 34,ILD_TRANSPARENT);
-    ImageList_Draw(himl2, my_time.min % 10, hdcMem, 202, 34,ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.min / 10, hdcMem, 193, 34, ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.min % 10, hdcMem, 202, 34, ILD_TRANSPARENT);
 
-    ImageList_Draw(himl2, my_time.sec / 10, hdcMem, 212, 34,ILD_TRANSPARENT);
-    ImageList_Draw(himl2, my_time.sec % 10, hdcMem, 220, 34,ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.sec / 10, hdcMem, 212, 34, ILD_TRANSPARENT);
+    ImageList_Draw(himl2, my_time.sec % 10, hdcMem, 220, 34, ILD_TRANSPARENT);
 
 
     for (int i = 0; i < 9; i++)
@@ -112,13 +112,13 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
+    wcex.hIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 48, 48, LR_DEFAULTCOLOR);
 
     wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = nullptr;
     wcex.lpszMenuName = MAKEINTRESOURCE(IDC_MY50);
     wcex.lpszClassName = szWindowClass;
-    wcex.hIconSm = (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+    wcex.hIconSm = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_MY50), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 
     return RegisterClassEx(&wcex);
 }
@@ -196,7 +196,7 @@ void CreateBubbles(HWND hWnd)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    int wmId, wmEvent;
+    int wmId;
     PAINTSTRUCT ps;
     static HANDLE hFile = nullptr;
     static int x, y;
@@ -215,272 +215,282 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_LBUTTONDOWN:
-        if (HIWORD(lParam) <= 56 || COUNT_RUN || COUNT_FETUS || COUNT_DESTROY || !START)
-            break;
-        if (ANIMATE_RUN)
-            walkability[x][y] &= zero;
-        startX = x;
-        startY = y;
+        {
+            if (HIWORD(lParam) <= 56 || COUNT_RUN || COUNT_FETUS || COUNT_DESTROY || !START)
+                break;
+            if (ANIMATE_RUN)
+                walkability[x][y] &= zero;
+            startX = x;
+            startY = y;
 
-        x = (LOWORD(lParam) - 5) / 45;
-        y = (HIWORD(lParam) - 56) / 45;
-        if (HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus) && walkability[x][y])
-        {
-            ANIMATE_RUN = true;
-            PlaySound(MY_SOUND_MOVE, nullptr, SND_FILENAME | SND_ASYNC);
-        }
-        else if (ANIMATE_RUN)
-        {
-            ANIMATE_RUN = false;
-            path = FindPath(startX, startY, x, y);
-            if (path == found)
+            x = (LOWORD(lParam) - 5) / 45;
+            y = (HIWORD(lParam) - 56) / 45;
+            if (HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus) && walkability[x][y])
             {
-                COUNT_RUN = pathLength;
+                ANIMATE_RUN = true;
+                PlaySound(MY_SOUND_MOVE, nullptr, SND_FILENAME | SND_ASYNC);
             }
-        }
-        break;
-    case WM_COMMAND:
-        wmId = LOWORD(wParam);
-        wmEvent = HIWORD(wParam);
-        switch (wmId)
-        {
-        case IDM_ABOUT:
-            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-            break;
-        case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
-        case ID_FILE_32771: //save
-            walkability[x][y] &= zero;
-            hFile = CreateFile(FILE_PATH, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
-                                        FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (hFile)
+            else if (ANIMATE_RUN)
             {
-                WriteFile(hFile, walkability, sizeof(walkability), &NumberOfBytesRead, nullptr);
-                WriteFile(hFile, &SCORE, sizeof(int), &NumberOfBytesRead, nullptr);
-                WriteFile(hFile, &my_time, sizeof(TIME), &NumberOfBytesRead, nullptr);
-
-                CloseHandle(hFile);
-            }
-            else
-            MessageBox(hWnd,_T("Невозможно открыть файл"),_T("Ошибка"), MB_ICONWARNING | MB_OK);
-
-            break;
-
-
-        case ID_FILE_32772: //load
-            ANIMATE_RUN = false;
-            hFile = CreateFile(FILE_PATH,GENERIC_READ,FILE_SHARE_READ, nullptr,OPEN_EXISTING,
-                                        FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (hFile)
-            {
-                ReadFile(hFile, walkability, sizeof(walkability), &NumberOfBytesRead, nullptr);
-                ReadFile(hFile, &SCORE, sizeof(int), &NumberOfBytesRead, nullptr);
-                ReadFile(hFile, &my_time, sizeof(TIME), &NumberOfBytesRead, nullptr);
-                CloseHandle(hFile);
-                COUNT_BUBBLES = 0;
-                int k = 0;
-                for (int i = 0; i < 9; i++)
+                ANIMATE_RUN = false;
+                path = FindPath(startX, startY, x, y);
+                if (path == found)
                 {
-                    for (int j = 0; j < 9; j++)
+                    COUNT_RUN = pathLength;
+                }
+            }
+            break;
+        }
+    case WM_COMMAND:
+        {
+            wmId = LOWORD(wParam);
+            switch (wmId)
+            {
+            case IDM_ABOUT:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                break;
+            case IDM_EXIT:
+                DestroyWindow(hWnd);
+                break;
+            case ID_FILE_32771: //save
+                {
+                    walkability[x][y] &= zero;
+                    hFile = CreateFile(FILE_PATH, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS,
+                                                FILE_ATTRIBUTE_NORMAL, nullptr);
+                    if (hFile)
                     {
-                        if (walkability[i][j])
+                        WriteFile(hFile, walkability, sizeof(walkability), &NumberOfBytesRead, nullptr);
+                        WriteFile(hFile, &SCORE, sizeof(int), &NumberOfBytesRead, nullptr);
+                        WriteFile(hFile, &my_time, sizeof(TIME), &NumberOfBytesRead, nullptr);
+
+                        CloseHandle(hFile);
+                    }
+                    else
+                    MessageBox(hWnd,_T("Невозможно открыть файл"),_T("Ошибка"), MB_ICONWARNING | MB_OK);
+
+                    break;
+                }
+
+            case ID_FILE_32772: //load
+                {
+                    ANIMATE_RUN = false;
+                    hFile = CreateFile(FILE_PATH,GENERIC_READ,FILE_SHARE_READ, nullptr,OPEN_EXISTING,
+                                                FILE_ATTRIBUTE_NORMAL, nullptr);
+                    if (hFile)
+                    {
+                        ReadFile(hFile, walkability, sizeof(walkability), &NumberOfBytesRead, nullptr);
+                        ReadFile(hFile, &SCORE, sizeof(int), &NumberOfBytesRead, nullptr);
+                        ReadFile(hFile, &my_time, sizeof(TIME), &NumberOfBytesRead, nullptr);
+                        CloseHandle(hFile);
+                        COUNT_BUBBLES = 0;
+                        int k = 0;
+                        for (int i = 0; i < 9; i++)
                         {
-                            COUNT_BUBBLES++;
-                            if (!(HIWORD(walkability[i][j]) ^ HIWORD(walkability_fetus)))
+                            for (int j = 0; j < 9; j++)
                             {
-                                fetus[k].x = i;
-                                fetus[k++].y = j;
+                                if (walkability[i][j])
+                                {
+                                    COUNT_BUBBLES++;
+                                    if (!(HIWORD(walkability[i][j]) ^ HIWORD(walkability_fetus)))
+                                    {
+                                        fetus[k].x = i;
+                                        fetus[k++].y = j;
+                                    }
+                                }
                             }
                         }
+                        START = TRUE;
+                        T1 = GetTickCount() - (my_time.hour * 3600 + my_time.min * 60 + my_time.sec) * 1000;
                     }
+                    else
+                    {
+                        MessageBox(hWnd, _T("Невозможно открыть файл"), _T("Ошибка"), MB_ICONWARNING | MB_OK);
+                    }
+
+                    break;
                 }
-                START = TRUE;
-                T1 = GetTickCount() - (my_time.hour * 3600 + my_time.min * 60 + my_time.sec) * 1000;
-            }
-            else
-            {
-                MessageBox(hWnd, _T("Невозможно открыть файл"), _T("Ошибка"), MB_ICONWARNING | MB_OK);
-            }
-
-            break;
-
-        case ID_GAME_NEW: //new
-            ANIMATE_RUN = false;
-            START = FALSE;
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
+            case ID_GAME_NEW: //new
                 {
-                    walkability[i][j] = 0;
+                    ANIMATE_RUN = false;
+                    START = FALSE;
+                    for (int i = 0; i < 9; i++)
+                    {
+                        for (int j = 0; j < 9; j++)
+                        {
+                            walkability[i][j] = 0;
+                        }
+                    }
+                    COUNT_BUBBLES = 0;
+                    SCORE = 0;
+                    CreateBubbles(hWnd);
+                    START = TRUE;
+
+                    T1 = GetTickCount();
+                    break;
                 }
+            default:
+                return DefWindowProc(hWnd, message, wParam, lParam);
             }
-            COUNT_BUBBLES = 0;
-            SCORE = 0;
-            CreateBubbles(hWnd);
-            START = TRUE;
-
-            T1 = GetTickCount();
             break;
-
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
     case WM_CREATE:
+        {
+            himl = ImageList_Create(40, 40, ILC_COLOR24, 154, 0);
+            himl2 = ImageList_Create(7, 13, ILC_COLOR32 | ILC_MASK, 10, 0);
+            himl3 = ImageList_Create(25, 25, ILC_COLOR24 | ILC_MASK, 7, 0);
+            himl4 = ImageList_Create(18, 35, ILC_COLOR32 | ILC_MASK, 10, 0);
+            ImageList_Add(himl, hBitmapNum1, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum2, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum3, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum4, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum5, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum6, (HBITMAP)nullptr);
+            ImageList_Add(himl, hBitmapNum7, (HBITMAP)nullptr);
+            ImageList_Add(himl2, hBitmapNum8, hBitmapNum12);
+            ImageList_Add(himl3, hBitmapNum9, hBitmapNum13);
+            ImageList_Add(himl4, hBitmapNum10, hBitmapNum11);
+            SetTimer(hWnd, TEMER_TIME, 50, nullptr);
+            hdc = GetDC(hWnd);
+            hdcMem = CreateCompatibleDC(hdc);
+            GetObject(hBitmapBKG, sizeof(bm), &bm);
 
-        himl = ImageList_Create(40, 40, ILC_COLOR24, 154, 0);
-        himl2 = ImageList_Create(7, 13, ILC_COLOR32 | ILC_MASK, 10, 0);
-        himl3 = ImageList_Create(25, 25, ILC_COLOR24 | ILC_MASK, 7, 0);
-        himl4 = ImageList_Create(18, 35, ILC_COLOR32 | ILC_MASK, 10, 0);
-        ImageList_Add(himl, hBitmapNum1, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum2, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum3, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum4, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum5, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum6, (HBITMAP)nullptr);
-        ImageList_Add(himl, hBitmapNum7, (HBITMAP)nullptr);
-        ImageList_Add(himl2, hBitmapNum8, hBitmapNum12);
-        ImageList_Add(himl3, hBitmapNum9, hBitmapNum13);
-        ImageList_Add(himl4, hBitmapNum10, hBitmapNum11);
-        SetTimer(hWnd, TEMER_TIME, 50, nullptr);
-        hdc = GetDC(hWnd);
-        hdcMem = CreateCompatibleDC(hdc);
-        GetObject(hBitmapBKG, sizeof(bm), &bm);
-
-        hBmpFrame = CreateCompatibleBitmap(hdc, bm.bmWidth, bm.bmHeight);
-        SelectObject(hdcMem, (HBITMAP)hBmpFrame);
-        break;
+            hBmpFrame = CreateCompatibleBitmap(hdc, bm.bmWidth, bm.bmHeight);
+            SelectObject(hdcMem, (HBITMAP)hBmpFrame);
+            break;
+        }
     case WM_ERASEBKGND:
         break;
     case WM_TIMER:
-        switch (wParam)
         {
-        case TEMER_TIME:
-            if (START)
+            switch (wParam)
             {
-                T2 = GetTickCount();
-                my_time.hour = (T2 - T1) / (1000 * 3600);
-                my_time.min = (T2 - T1) / (1000 * 60) - my_time.hour * 60;
-                my_time.sec = (T2 - T1) / 1000 - my_time.hour * 3600 - my_time.min * 60;
-            }
-            if (ANIMATE_RUN) 
-            {
-                walkability[x][y] = ((((walkability[x][y] >> 16) + 1) % 7) << 16) + (walkability[x][y] & 0x0000ffff);
-            }
-
-            if (COUNT_FETUS)
-            {
-                for (int i = 0; i < 3; i++)
+            case TEMER_TIME:
+                if (START)
                 {
-                    if (!(HIWORD(walkability[fetus[i].x][fetus[i].y])))
+                    T2 = GetTickCount();
+                    my_time.hour = (T2 - T1) / (1000 * 3600);
+                    my_time.min = (T2 - T1) / (1000 * 60) - my_time.hour * 60;
+                    my_time.sec = (T2 - T1) / 1000 - my_time.hour * 3600 - my_time.min * 60;
+                }
+                if (ANIMATE_RUN) 
+                {
+                    walkability[x][y] = ((((walkability[x][y] >> 16) + 1) % 7) << 16) + (walkability[x][y] & 0x0000ffff);
+                }
+
+                if (COUNT_FETUS)
+                {
+                    for (int i = 0; i < 3; i++)
                     {
-                        do
+                        if (!(HIWORD(walkability[fetus[i].x][fetus[i].y])))
                         {
-                            x = rand() % 9;
-                            y = rand() % 9;
+                            do
+                            {
+                                x = rand() % 9;
+                                y = rand() % 9;
+                            }
+                            while (walkability[x][y]);
+                            walkability[x][y] = walkability_fetus;
+                            walkability[x][y] += (rand() % 7) * 22 + 1;
+                            fetus[i].x = x;
+                            fetus[i].y = y;
                         }
-                        while (walkability[x][y]);
-                        walkability[x][y] = walkability_fetus;
-                        walkability[x][y] += (rand() % 7) * 22 + 1;
-                        fetus[i].x = x;
-                        fetus[i].y = y;
+                        walkability[fetus[i].x][fetus[i].y] = ((((walkability[fetus[i].x][fetus[i].y] >> 16) - 1)) << 16) +
+                            (walkability[fetus[i].x][fetus[i].y] & 0x0000ffff);
                     }
-                    walkability[fetus[i].x][fetus[i].y] = ((((walkability[fetus[i].x][fetus[i].y] >> 16) - 1)) << 16) +
-                        (walkability[fetus[i].x][fetus[i].y] & zero);
-                }
-                COUNT_FETUS--;
+                    COUNT_FETUS--;
 
-                if (!COUNT_FETUS)
-                {
-                    CreateBubbles(hWnd);
+                    if (!COUNT_FETUS)
+                    {
+                        CreateBubbles(hWnd);
+                    }
                 }
-            }
 
-            if (COUNT_DESTROY)
-            {
-                for (int i = 0; i < LENGTH_DESTROY; i++)
-                {
-                    walkability[PatchDestroy[i].x][PatchDestroy[i].y] = ((17 - COUNT_DESTROY) << 16) +
-                        (walkability[PatchDestroy[i].x][PatchDestroy[i].y] & 0x0000ffff);
-                }
-                COUNT_DESTROY--;
-                if (!COUNT_DESTROY)
+                if (COUNT_DESTROY)
                 {
                     for (int i = 0; i < LENGTH_DESTROY; i++)
                     {
-                        walkability[PatchDestroy[i].x][PatchDestroy[i].y] = 0;
+                        walkability[PatchDestroy[i].x][PatchDestroy[i].y] = ((17 - COUNT_DESTROY) << 16) +
+                            (walkability[PatchDestroy[i].x][PatchDestroy[i].y] & 0x0000ffff);
                     }
-                    dest_len(PatchDestroy);
-                    SCORE += LENGTH_DESTROY;
-                }
-            }
-
-
-            if (COUNT_RUN)
-            {
-                if (COUNT_RUN == pathLength)
-                {
-                    if (!walkability[pathBank[0].x][pathBank[0].y] ||
-                        !(HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus)))
+                    COUNT_DESTROY--;
+                    if (!COUNT_DESTROY)
                     {
-                        walkability[pathBank[0].x][pathBank[0].y] = walkability[startX][startY] & zero;
+                        for (int i = 0; i < LENGTH_DESTROY; i++)
+                        {
+                            walkability[PatchDestroy[i].x][PatchDestroy[i].y] = 0;
+                        }
+                        dest_len(PatchDestroy);
+                        SCORE += LENGTH_DESTROY;
+                    }
+                }
+
+
+                if (COUNT_RUN)
+                {
+                    if (COUNT_RUN == pathLength)
+                    {
+                        if (!walkability[pathBank[0].x][pathBank[0].y] ||
+                            !(HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus)))
+                        {
+                            walkability[pathBank[0].x][pathBank[0].y] = walkability[startX][startY] & zero;
+                        }
+                        else
+                        {
+                            walkability[pathBank[1].x][pathBank[1].y] = walkability[startX][startY] & zero;
+                            COUNT_RUN--;
+                        }
+                        walkability[startX][startY] = 0;
                     }
                     else
                     {
-                        walkability[pathBank[1].x][pathBank[1].y] = walkability[startX][startY] & zero;
-                        COUNT_RUN--;
+                        if (!walkability[pathBank[pathLength - COUNT_RUN].x][pathBank[pathLength - COUNT_RUN].y] ||
+                            !(HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus)))
+                        {
+                            walkability[pathBank[pathLength - COUNT_RUN].x][pathBank[pathLength - COUNT_RUN].y] =
+                                walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y];
+                            walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y] = 0;
+                        }
+                        else
+                        {
+                            walkability[pathBank[pathLength - COUNT_RUN + 1].x][pathBank[pathLength - COUNT_RUN + 1].y] =
+                                walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y];
+                            walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y] = 0;
+                            COUNT_RUN--;
+                        }
                     }
-                    walkability[startX][startY] = 0;
-                }
-                else
-                {
-                    if (!walkability[pathBank[pathLength - COUNT_RUN].x][pathBank[pathLength - COUNT_RUN].y] ||
-                        !(HIWORD(walkability[x][y]) ^ HIWORD(walkability_fetus)))
+                    COUNT_RUN--;
+                    if (COUNT_RUN <= 0)
                     {
-                        walkability[pathBank[pathLength - COUNT_RUN].x][pathBank[pathLength - COUNT_RUN].y] =
-                            walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y];
-                        walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y] = 0;
-                    }
-                    else
-                    {
-                        walkability[pathBank[pathLength - COUNT_RUN + 1].x][pathBank[pathLength - COUNT_RUN + 1].y] =
-                            walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y];
-                        walkability[pathBank[pathLength - COUNT_RUN - 1].x][pathBank[pathLength - COUNT_RUN - 1].y] = 0;
-                        COUNT_RUN--;
-                    }
-                }
-                COUNT_RUN--;
-                if (COUNT_RUN <= 0)
-                {
-                    if (PatchDestroy = len(x, y, LENGTH_DESTROY))
-                    {
-                        COUNT_DESTROY = 10;
-                        COUNT_BUBBLES -= LENGTH_DESTROY;
-                        PlaySound(MY_SOUND_DESTROY, nullptr, SND_FILENAME | SND_ASYNC);
-                    }
-                    COUNT_FETUS = 4;
-                    path = 0;
+                        if (PatchDestroy = len(x, y, LENGTH_DESTROY))
+                        {
+                            COUNT_DESTROY = 10;
+                            COUNT_BUBBLES -= LENGTH_DESTROY;
+                            PlaySound(MY_SOUND_DESTROY, nullptr, SND_FILENAME | SND_ASYNC);
+                        }
+                        COUNT_FETUS = 4;
+                        path = 0;
 
-                    EndPathfinder();
+                        EndPathfinder();
+                    }
                 }
+                break;
             }
+            Paint(hdc, hdcMem);
+            BitBlt(hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
             break;
         }
-        Paint(hdc, hdcMem);
-        BitBlt(hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
-        break;
-
     case WM_DESTROY:
-        ImageList_Destroy(himl);
-        ImageList_Destroy(himl2);
-        ImageList_Destroy(himl3);
-        ImageList_Destroy(himl4);
-        ReleaseDC(hWnd, hdc);
-        DeleteDC(hdcMem);
-        KillTimer(hWnd,TEMER_TIME);
-        PostQuitMessage(0);
-        break;
+        {
+            ImageList_Destroy(himl);
+            ImageList_Destroy(himl2);
+            ImageList_Destroy(himl3);
+            ImageList_Destroy(himl4);
+            ReleaseDC(hWnd, hdc);
+            DeleteDC(hdcMem);
+            KillTimer(hWnd, TEMER_TIME);
+            PostQuitMessage(0);
+            break;
+        }
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

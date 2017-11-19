@@ -166,7 +166,6 @@ int FindPath(int startX, int startY, int targetX, int targetY)
                 }
             }
         }
-
         else
         {
             path = nonexistent;
